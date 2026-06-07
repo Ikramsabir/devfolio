@@ -1,0 +1,20 @@
+<nav class="navbar-profile">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <a routerLink="/accueil" class="back-link">← Retour Accueil</a>
+    </div>
+    <div class="nav-tabs">
+      <button [class.active]="activeTab === 'projets'" (click)="setActiveTab('projets')">Projets</button>
+      <button [class.active]="activeTab === 'competences'" (click)="setActiveTab('competences')">Compétences</button>
+      <button *ngIf="!isOwner" [class.active]="activeTab === 'contact'" (click)="setActiveTab('contact')">Contact</button>
+      <button *ngIf="isOwner" [class.active]="activeTab === 'inbox'" (click)="setActiveTab('inbox')">
+        Boîte de réception <span *ngIf="unreadCount > 0" class="badge">{{ unreadCount }}</span>
+      </button>
+      <button *ngIf="isOwner" [class.active]="activeTab === 'settings'" (click)="setActiveTab('settings')">Paramètres</button>
+    </div>
+    <button class="theme-toggle" (click)="toggleTheme()">
+      <i *ngIf="!isDarkMode" class="fas fa-moon"></i>
+      <i *ngIf="isDarkMode" class="fas fa-sun"></i>
+    </button>
+  </div>
+</nav>

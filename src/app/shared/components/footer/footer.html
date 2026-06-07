@@ -1,0 +1,27 @@
+<footer class="footer-visitor" *ngIf="!isLoggedIn">
+  <div class="footer-container">
+    <div class="footer-col">
+      <h3>DevFolio</h3>
+      <p>La plateforme numéro 1 pour mettre en avant vos projets et vos compétences.</p>
+    </div>
+    <div class="footer-col">
+      <h3>Liens utiles</h3>
+      <ul>
+        <li><a href="/accueil">Accueil</a></li>
+        <li><a href="/recherche">Recherche</a></li>
+        <li><a href="/register">S'inscrire</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Contact</h3>
+      <p>Email: contact@devfolio.com</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 DevFolio. Tous droits réservés.</p>
+  </div>
+</footer>
+
+<footer class="footer-connected" *ngIf="isLoggedIn">
+  <p>&copy; 2026 DevFolio - propulsé par la communauté</p>
+</footer>

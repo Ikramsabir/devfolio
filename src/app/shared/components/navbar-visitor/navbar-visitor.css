@@ -1,0 +1,223 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.navbar {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  width: 100%;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nav-brand a {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #fff, #a0a0c0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: transform 0.3s ease;
+}
+
+.nav-brand a:hover {
+  transform: scale(1.02);
+}
+
+.nav-menu {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nav-menu a {
+  color: #e0e0e0;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-menu a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: #dd0031;
+  transition: width 0.3s ease;
+}
+
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+  width: 100%;
+}
+
+.nav-menu a.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-login, .btn-register {
+  padding: 0.5rem 1.4rem !important;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.btn-login {
+  background: transparent;
+  border-color: #dd0031;
+  color: #dd0031;
+}
+
+.btn-login:hover {
+  background: #dd0031;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.btn-register {
+  background: rgba(221, 0, 49, 0.15);
+  border-color: #dd0031;
+  color: #e0e0e0;
+}
+
+.btn-register:hover {
+  background: #dd0031;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.btn-login::after, .btn-register::after {
+  display: none !important;
+}
+
+/* --- زر الثيم --- */
+.theme-toggle {
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.3rem 0.7rem;
+  margin-left: 1rem;
+  transition: all 0.2s;
+  color: white;
+}
+
+/* --- زر الخروج --- */
+.logout-btn {
+  background: transparent;
+  border: 1px solid #dd0031;
+  color: #dd0031;
+  padding: 0.4rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+  background: rgba(221, 0, 49, 0.15);
+  border-color: #dd0031;
+  color: white;
+}
+
+/* --- Dark mode --- */
+:host-context(body.dark-theme) .navbar {
+  background: linear-gradient(135deg, #0a0a1a 0%, #12121f 100%);
+}
+
+:host-context(body.dark-theme) .theme-toggle {
+  border-color: #555;
+  background: #2c2c3a;
+  color: white;
+}
+
+:host-context(body.dark-theme) .btn-login {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+:host-context(body.dark-theme) .btn-login:hover {
+  background: #ff6b6b;
+  color: #0f172a;
+}
+
+:host-context(body.dark-theme) .btn-register {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: #ff6b6b;
+  color: #e0e0e0;
+}
+
+:host-context(body.dark-theme) .btn-register:hover {
+  background: #ff6b6b;
+  color: #0f172a;
+}
+
+:host-context(body.dark-theme) .logout-btn {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+:host-context(body.dark-theme) .logout-btn:hover {
+  background: rgba(255, 107, 107, 0.2);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+  .nav-menu {
+    gap: 0.8rem;
+    justify-content: center;
+  }
+  .btn-login, .btn-register {
+    padding: 0.4rem 1.2rem !important;
+    font-size: 0.9rem;
+  }
+  .theme-toggle, .logout-btn {
+    margin-left: 0;
+  }
+}
+
+.badge {
+  background-color: #ef4444;
+  color: white;
+  border-radius: 50%;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-left: 0.2rem;
+  vertical-align: top;
+}

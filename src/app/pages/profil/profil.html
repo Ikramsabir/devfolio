@@ -1,0 +1,450 @@
+<app-navbar-profile [activeTab]="activeTab" [isOwner]="isOwner" [unreadCount]="unreadCount" (tabChange)="setActiveTab($event)"></app-navbar-profile>
+
+<div class="profil-container" *ngIf="user; else notFound">
+
+  <!-- Hero section -->
+  <div class="hero-section">
+    <div class="hero-wrapper">
+      <!-- Avatar avec boutons caméra + supprimer pour le propriétaire -->
+      <div class="hero-avatar" [class.is-owner]="isOwner">
+        <div class="avatar-wrapper" (click)="isOwner ? triggerAvatarUpload() : null">
+          <img *ngIf="user.avatar" [src]="user.avatar" alt="Avatar de {{ user.nom }}">
+          <div *ngIf="!user.avatar" class="avatar-placeholder">
+            <i class="fas fa-user"></i>
+          </div>
+          <div *ngIf="isOwner" class="avatar-overlay">
+            <i class="fas fa-camera"></i>
+            <span>Changer</span>
+          </div>
+        </div>
+        <!-- Bouton supprimer (visible seulement si photo existe) -->
+        <div *ngIf="isOwner && user.avatar" class="avatar-actions">
+          <button class="btn-avatar-action btn-avatar-delete" (click)="removeAvatar()" title="Supprimer la photo">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <input type="file" id="avatarUpload" (change)="onAvatarUpload($event)" accept="image/jpeg,image/png,image/gif" style="display: none;">
+      </div>
+      <div class="hero-content">
+        <h1>Bonjour, je suis <span class="name">{{ user.nom }}</span></h1>
+        <p class="title">{{ user.titre }}</p>
+        <p class="bio" *ngIf="user.bio">{{ user.bio }}</p>
+        <div class="hero-buttons">
+          <button *ngIf="isLoggedIn && !isOwner" class="btn-contact" (click)="setActiveTab('contact')">
+            <i class="fas fa-envelope"></i> Me contacter
+          </button>
+          <button *ngIf="!isOwner" class="btn-cv" (click)="downloadCV()">
+            <i class="fas fa-file-pdf"></i> Télécharger CV
+          </button>
+          <input type="file" id="cvUpload" (change)="onCvUpload($event)" accept=".pdf" style="display: none;" />
+          <button *ngIf="isOwner" class="btn-cv" (click)="triggerCvUpload()">
+            <i class="fas fa-upload"></i> Uploader CV (PDF)
+          </button>
+          <span *ngIf="isOwner && user.cvUrl" class="cv-name"><i class="fas fa-check-circle"></i> {{ user.cvUrl }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Onglet Projets
+  ═══════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'projets'">
+    <div class="filters-section">
+      <div class="filter-buttons">
+        <button *ngFor="let tech of techList" [class.active]="techFilter === tech" (click)="setTechFilter(tech)">
+          {{ tech }}
+        </button>
+      </div>
+      <button *ngIf="isOwner" class="btn-add-project" (click)="openProjectModal()">
+        <i class="fas fa-plus"></i> Ajouter un projet
+      </button>
+    </div>
+
+    <div class="projects-grid">
+      <div *ngFor="let project of filteredProjects" class="project-card">
+        <div class="card-icon">
+          <i class="fas fa-code-branch"></i>
+          <span *ngIf="isOwner" class="badge-status {{ project.status }}">{{ project.status }}</span>
+        </div>
+        <h3>{{ project.titre }}</h3>
+        <p class="project-desc-short">{{ project.description }}</p>
+        <p class="project-tech">
+          <span *ngFor="let t of project.technologies.slice(0,3)">{{ t }}</span>
+        </p>
+        <div *ngIf="project.liens && project.liens.length > 0" class="project-links">
+          <a *ngFor="let lien of project.liens" [href]="lien.url" target="_blank" class="project-link-btn"
+             [title]="lien.customName || lien.type">
+            <i [class]="getLinkIcon(lien.type)"></i>
+          </a>
+        </div>
+        <div class="project-actions">
+          <a [routerLink]="['/projet', project.id]" class="card-link">Voir →</a>
+          <div *ngIf="isOwner" class="owner-actions">
+            <button class="btn-icon" (click)="openProjectModal(project)" title="Modifier"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon danger" (click)="deleteProject(project.id)" title="Supprimer"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="filteredProjects.length === 0" class="empty-state">
+      <i class="fas fa-folder-open"></i>
+      <p>Aucun projet à afficher.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Onglet Compétences
+  ═══════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'competences'">
+    <div class="skills-section">
+      <div class="section-header-row">
+        <h2 class="section-title">Compétences techniques</h2>
+        <button *ngIf="isOwner" class="btn-add-project" (click)="openCompetenceModal()">
+          <i class="fas fa-plus"></i> Ajouter
+        </button>
+      </div>
+      <div class="skills-list">
+        <div *ngFor="let skill of user.competences; let i = index" class="skill-card">
+          <div class="skill-header">
+            <div class="skill-name">
+              <i class="fas fa-check-circle"></i>
+              <span>{{ skill.nom }}</span>
+            </div>
+            <div *ngIf="isOwner" class="skill-actions">
+              <button class="btn-icon" (click)="openCompetenceModal(i)" title="Modifier"><i class="fas fa-edit"></i></button>
+              <button class="btn-icon danger" (click)="deleteCompetence(i)" title="Supprimer"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <p *ngIf="skill.description" class="skill-desc">{{ skill.description }}</p>
+        </div>
+        <div *ngIf="user.competences.length === 0" class="empty-state">
+          <i class="fas fa-tools"></i>
+          <p>Aucune compétence renseignée.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Onglet Contact (Visiteur Connecté)
+  ═══════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'contact' && !isOwner">
+    <div class="contact-section">
+
+      <!-- Non connecté -->
+      <div *ngIf="!isLoggedIn" class="contact-blocked">
+        <i class="fas fa-lock"></i>
+        <p>Pour contacter ce développeur, vous devez être connecté.</p>
+        <div class="contact-buttons">
+          <a routerLink="/login" class="btn-login">Se connecter</a>
+          <a routerLink="/register" class="btn-register">Créer un compte</a>
+        </div>
+      </div>
+
+      <!-- Connecté -->
+      <div *ngIf="isLoggedIn" class="contact-layout">
+        <div class="contact-info-panel" *ngIf="user.contacts && user.contacts.length > 0">
+          <h3 class="contact-info-title">Retrouvez {{ user.nom }}</h3>
+          <div class="contact-entries">
+            <div *ngFor="let entry of user.contacts" class="contact-entry">
+              <span class="contact-entry-icon"><i [class]="getContactIcon(entry.type)"></i></span>
+              <div>
+                <span class="contact-entry-label">{{ entry.customName || getContactLabel(entry.type) }}</span>
+                <span class="contact-entry-value">{{ entry.value }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form-panel">
+          <h3>Envoyer un message</h3>
+          <p class="contact-subtitle">Une idée, une collaboration, une question ?</p>
+          <form (ngSubmit)="sendMessage()" class="contact-form">
+            <div class="form-group">
+              <label><i class="fas fa-tag"></i> Sujet</label>
+              <input type="text" [(ngModel)]="contactSubject" name="subject" required placeholder="Ex : Proposition de collaboration">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-comment-dots"></i> Message</label>
+              <textarea [(ngModel)]="contactMessage" name="message" rows="5" required placeholder="Votre message..."></textarea>
+            </div>
+            <button type="submit" class="btn-send" [disabled]="!contactSubject || !contactMessage">
+              <i class="fas fa-paper-plane"></i> Envoyer
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Onglet Boîte de réception (Propriétaire)
+  ═══════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'inbox' && isOwner">
+    <div class="inbox-section">
+      <h2 class="section-title">Boîte de réception</h2>
+      <div class="message-list">
+        <div *ngFor="let msg of messages" class="message-card" [class.unread]="!msg.read">
+          <div class="message-header">
+            <div class="message-subject-wrap">
+              <span *ngIf="!msg.read" class="unread-dot"></span>
+              <h4>{{ msg.subject }}</h4>
+            </div>
+            <span class="message-date">{{ msg.timestamp | date:'dd/MM/yy HH:mm' }}</span>
+          </div>
+          <p class="message-sender"><i class="fas fa-user"></i> <a [routerLink]="['/profil', msg.senderId]">{{ msg.senderName }}</a></p>
+          <p class="message-content">{{ msg.content }}</p>
+        </div>
+        <div *ngIf="messages.length === 0" class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>Votre boîte de réception est vide.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Onglet Paramètres (Propriétaire)
+  ═══════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'settings' && isOwner">
+    <div class="settings-section">
+      <h2 class="section-title">Paramètres du profil</h2>
+      <form (ngSubmit)="saveSettings()" class="settings-form">
+        <h3 class="subsection-title">Informations générales</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nom complet</label>
+            <input type="text" [(ngModel)]="editUser.nom" name="nom">
+          </div>
+          <div class="form-group">
+            <label>Titre professionnel</label>
+            <input type="text" [(ngModel)]="editUser.titre" name="titre">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Bio</label>
+          <textarea [(ngModel)]="editUser.bio" name="bio" rows="3" placeholder="Décrivez-vous en quelques phrases..."></textarea>
+        </div>
+
+        <h3 class="subsection-title">Coordonnées de contact</h3>
+        <p class="settings-hint">Ces coordonnées seront visibles par les utilisateurs qui consultent votre profil.</p>
+        <div *ngFor="let entry of editContacts; let i = index" class="contact-entry-editor">
+          <select [(ngModel)]="entry.type" [name]="'ctype' + i">
+            <option *ngFor="let t of contactTypes" [value]="t">{{ getContactLabel(t) }}</option>
+          </select>
+          <input *ngIf="entry.type === 'custom'" type="text" [(ngModel)]="entry.customName"
+                 [name]="'cname' + i" placeholder="Nom du lien (ex: Portfolio)">
+          <input type="text" [(ngModel)]="entry.value" [name]="'cval' + i" placeholder="Votre valeur (ex: @username)">
+          <button type="button" class="btn-icon danger" (click)="removeContactEntry(i)"><i class="fas fa-times"></i></button>
+        </div>
+        <button type="button" class="btn-add-contact" (click)="addContactEntry()">
+          <i class="fas fa-plus"></i> Ajouter une coordonnée
+        </button>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">
+            <i class="fas fa-save"></i> Sauvegarder
+          </button>
+        </div>
+      </form>
+
+      <!-- Danger Zone -->
+      <div class="danger-zone">
+        <h3><i class="fas fa-exclamation-triangle"></i> Zone dangereuse</h3>
+        <p>La suppression de votre compte est irréversible. Tous vos projets, compétences et messages seront définitivement supprimés.</p>
+        <button class="btn-danger" (click)="confirmDeleteAccount()">
+          <i class="fas fa-user-times"></i> Supprimer mon compte
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #notFound>
+  <div class="not-found">
+    <h2>Utilisateur non trouvé</h2>
+    <a routerLink="/accueil">Retour à l'accueil</a>
+  </div>
+</ng-template>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════════════ -->
+
+<!-- Modal Succès Contact -->
+<div class="modal-overlay" *ngIf="contactSuccess">
+  <div class="modal-content text-center success-modal">
+    <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+    <h2>Message envoyé !</h2>
+    <p>Votre message a bien été transmis à <strong>{{ user?.nom }}</strong>.</p>
+    <div class="modal-actions" style="justify-content: center;">
+      <button class="btn-save" (click)="closeContactSuccess()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ajout/Modification Projet -->
+<div class="modal-overlay" *ngIf="showProjectModal">
+  <div class="modal-content modal-large">
+    <h2><i class="fas fa-code-branch"></i> {{ editingProject.id ? 'Modifier' : 'Ajouter' }} un projet</h2>
+    <form (ngSubmit)="saveProject()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Titre du projet *</label>
+          <input type="text" [(ngModel)]="editingProject.titre" name="projTitre" required placeholder="Ex: DevFolio">
+        </div>
+        <div class="form-group">
+          <label>Statut</label>
+          <select [(ngModel)]="editingProject.status" name="projStatus">
+            <option value="public">Public</option>
+            <option value="private">Privé</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description courte *</label>
+        <input type="text" [(ngModel)]="editingProject.description" name="projDesc" required placeholder="Ex: Application web, App mobile...">
+      </div>
+      <div class="form-group">
+        <label>Description complète</label>
+        <textarea [(ngModel)]="editingProject.fullDescription" name="projFullDesc" rows="4" placeholder="Détails techniques, fonctionnalités, architecture..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Technologies (séparées par des virgules)</label>
+        <input type="text" [(ngModel)]="editingProject.techString" name="projTech" placeholder="Angular, Node.js, MongoDB...">
+      </div>
+
+      <div class="form-group">
+        <label><i class="far fa-calendar-alt"></i> Date / Année du projet</label>
+        <input type="text" [(ngModel)]="editingProject.date" name="projDate" placeholder="Ex: 2024, 2023-2025">
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>Liens du projet</label>
+          <button type="button" class="btn-add-small" (click)="addProjectLink()"><i class="fas fa-plus"></i> Ajouter un lien</button>
+        </div>
+        <div *ngFor="let lien of editingProject.liens; let i = index" class="dynamic-row">
+          <select [(ngModel)]="lien.type" [name]="'ltype' + i">
+            <option value="github">GitHub</option>
+            <option value="demoweb">Demo Web</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="custom">Autre nom</option>
+          </select>
+          <input *ngIf="lien.type === 'custom'" type="text" [(ngModel)]="lien.customName" [name]="'lname' + i" placeholder="Nom du lien">
+          <input type="url" [(ngModel)]="lien.url" [name]="'lurl' + i" placeholder="https://...">
+          <button type="button" class="btn-icon danger" (click)="removeProjectLink(i)"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>Documents joints <small>(max 3 : PDF, Word, image...)</small></label>
+          <button type="button" class="btn-add-small" (click)="addProjectDocument()" [disabled]="editingProject.documents?.length >= 3">
+            <i class="fas fa-plus"></i> Ajouter un document
+          </button>
+        </div>
+        <div *ngFor="let doc of editingProject.documents; let i = index" class="dynamic-row doc-row">
+          <div class="doc-fields">
+            <select [(ngModel)]="doc.nom" [name]="'dnom' + i">
+              <option value="rapport">Rapport</option>
+              <option value="presentation">Présentation</option>
+              <option value="documentation">Documentation</option>
+              <option value="maquette">Maquette</option>
+              <option value="autre">Autre</option>
+            </select>
+            <input type="text" [(ngModel)]="doc.description" [name]="'ddesc' + i" placeholder="Courte description (optionnel)">
+            <label class="file-upload-btn">
+              <i class="fas fa-upload"></i> {{ doc.fileName || 'Choisir fichier' }}
+              <input type="file" (change)="onProjectDocUpload($event, i)" style="display:none;">
+            </label>
+          </div>
+          <button type="button" class="btn-icon danger" (click)="removeProjectDocument(i)"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeProjectModal()">Annuler</button>
+        <button type="submit" class="btn-save">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Confirmation Suppression Projet -->
+<div class="modal-overlay" *ngIf="projectToDelete !== null">
+  <div class="modal-content text-center">
+    <div class="danger-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <h2>Supprimer ce projet ?</h2>
+    <p>Cette action est irréversible. Le projet sera définitivement supprimé.</p>
+    <div class="modal-actions" style="justify-content: center;">
+      <button class="btn-cancel" (click)="cancelDeleteProject()">Annuler</button>
+      <button class="btn-danger-sm" (click)="executeDeleteProject()"><i class="fas fa-trash"></i> Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ajout/Modification Compétence -->
+<div class="modal-overlay" *ngIf="showCompetenceModal">
+  <div class="modal-content">
+    <h2><i class="fas fa-tools"></i> {{ editingCompetenceIndex === -1 ? 'Ajouter' : 'Modifier' }} une compétence</h2>
+    <form (ngSubmit)="saveCompetence()">
+      <div class="form-group">
+        <label>Nom de la compétence *</label>
+        <input type="text" [(ngModel)]="editingCompetence.nom" name="skillNom" required placeholder="Ex: Angular, Python...">
+      </div>
+      <div class="form-group">
+        <label>Description / Commentaire</label>
+        <textarea [(ngModel)]="editingCompetence.description" name="skillDesc" rows="3"
+                  placeholder="Ex: 3 ans d'expérience, projets professionnels..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeCompetenceModal()">Annuler</button>
+        <button type="submit" class="btn-save">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Confirmation Avatar -->
+<div class="modal-overlay" *ngIf="showAvatarModal">
+  <div class="modal-content text-center">
+    <h3>Changer la photo de profil</h3>
+    <img *ngIf="tempAvatar" [src]="tempAvatar" style="width: 120px; height: 120px; border-radius: 50%; margin: 1rem auto; display: block; object-fit: cover; border: 3px solid #dd0031;">
+    <p>Confirmez-vous cette nouvelle photo ?</p>
+    <div class="modal-actions" style="justify-content: center;">
+      <button class="btn-cancel" (click)="closeAvatarModal()">Annuler</button>
+      <button class="btn-save" (click)="saveAvatar()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmation Suppression Compte -->
+<div class="modal-overlay" *ngIf="showDeleteAccountModal">
+  <div class="modal-content text-center">
+    <div class="danger-icon"><i class="fas fa-user-times"></i></div>
+    <h2>Supprimer votre compte ?</h2>
+    <p style="color:#475569; margin-bottom: 1.2rem;">
+      Cette action est <strong>irréversible</strong>. Tous vos projets, compétences et messages seront supprimés.
+    </p>
+    <div class="form-group" style="text-align:left; margin-bottom: 1rem;">
+      <label style="font-size:0.9rem; color:#334155;">Tapez <strong>SUPPRIMER</strong> pour confirmer</label>
+      <input type="text" [(ngModel)]="deleteConfirmText" name="deleteConfirm"
+             placeholder="SUPPRIMER"
+             style="width:100%; padding:0.7rem; border:1.5px solid #e2e8f0; border-radius:10px; margin-top:0.4rem; font-size:0.95rem;">
+    </div>
+    <div class="modal-actions" style="justify-content: center;">
+      <button class="btn-cancel" (click)="closeDeleteAccountModal()">Annuler</button>
+      <button class="btn-danger-sm"
+              [disabled]="deleteConfirmText !== 'SUPPRIMER'"
+              (click)="executeDeleteAccount()">
+        <i class="fas fa-trash"></i> Supprimer définitivement
+      </button>
+    </div>
+  </div>
+</div>

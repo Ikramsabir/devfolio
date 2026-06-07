@@ -1,0 +1,31 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <a routerLink="/accueil">DevFolio</a>
+    </div>
+    <div class="nav-menu">
+      <a routerLink="/accueil" routerLinkActive="active">Accueil</a>
+      <a routerLink="/recherche" routerLinkActive="active">Recherche</a>
+      
+      <!-- Liens pour visiteur -->
+      <ng-container *ngIf="!isLoggedIn">
+        <a routerLink="/login" routerLinkActive="active" class="btn-login">Se connecter</a>
+        <a routerLink="/register" routerLinkActive="active" class="btn-register">Inscrie</a>
+      </ng-container>
+
+      <!-- Liens pour connecté -->
+      <ng-container *ngIf="isLoggedIn">
+        <a [routerLink]="['/profil', currentUser?.id]" routerLinkActive="active" title="Mon Profil" class="profile-link">
+          <i class="fas fa-user-circle"></i> Mon Profil
+          <span *ngIf="unreadCount > 0" class="badge">{{ unreadCount }}</span>
+        </a>
+        <button class="logout-btn" (click)="logout()">Déconnexion</button>
+      </ng-container>
+
+      <button class="theme-toggle" (click)="toggleTheme()">
+        <i *ngIf="!isDarkMode" class="fas fa-moon"></i>
+        <i *ngIf="isDarkMode" class="fas fa-sun"></i>
+      </button>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,80 @@
+<app-navbar-visitor></app-navbar-visitor>
+
+<div class="recherche-container">
+  <div class="search-bar">
+    <i class="fas fa-search search-icon"></i>
+    <input type="text"
+           [(ngModel)]="searchTerm"
+           (ngModelChange)="onSearch()"
+           placeholder="Rechercher un projet ou un développeur...">
+  </div>
+
+  <div class="filter-tabs">
+    <button [class.active]="filter === 'tous'" (click)="setFilter('tous')">Tous</button>
+    <button [class.active]="filter === 'projets'" (click)="setFilter('projets')">Projets</button>
+    <button [class.active]="filter === 'profils'" (click)="setFilter('profils')">Profils</button>
+  </div>
+
+  <!-- Section Projets -->
+  <div *ngIf="filter === 'tous' || filter === 'projets'">
+    <h2 class="section-title">Projets</h2>
+
+    <!-- Pas de recherche encore -->
+    <div *ngIf="searchTerm.trim() === ''" class="empty-state">
+      <i class="fas fa-keyboard"></i>
+      <p>Commencez à taper pour rechercher des projets...</p>
+    </div>
+
+    <!-- Recherche sans résultat -->
+    <div *ngIf="searchTerm.trim() !== '' && filteredProjects.length === 0" class="empty-state">
+      <i class="fas fa-folder-open"></i>
+      <p>Aucun projet trouvé pour "{{ searchTerm }}"</p>
+    </div>
+
+    <!-- Affichage des résultats -->
+    <div class="projects-grid" *ngIf="searchTerm.trim() !== '' && filteredProjects.length > 0">
+      <div *ngFor="let project of filteredProjects" class="project-card">
+        <div class="card-icon"><i class="fas fa-rocket"></i></div>
+        <h3>{{ project.titre }}</h3>
+        <p class="project-desc">{{ project.description }}</p>
+        <div class="project-tech">
+          <span *ngFor="let t of project.technologies">{{ t }}</span>
+        </div>
+        <a [routerLink]="['/projet', project.id]" class="card-link">Voir le projet →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Profils -->
+  <div *ngIf="filter === 'tous' || filter === 'profils'">
+    <h2 class="section-title">Développeurs</h2>
+
+    <div *ngIf="searchTerm.trim() === ''" class="empty-state">
+      <i class="fas fa-keyboard"></i>
+      <p>Commencez à taper pour rechercher des développeurs...</p>
+    </div>
+
+    <div *ngIf="searchTerm.trim() !== '' && filteredUsers.length === 0" class="empty-state">
+      <i class="fas fa-user-slash"></i>
+      <p>Aucun profil trouvé pour "{{ searchTerm }}"</p>
+    </div>
+
+    <div class="profiles-grid" *ngIf="searchTerm.trim() !== '' && filteredUsers.length > 0">
+      <div *ngFor="let user of filteredUsers" class="profile-card">
+        <div class="profile-avatar">
+          <img *ngIf="user.avatar" [src]="user.avatar" [alt]="user.nom" class="profile-avatar-img">
+          <i *ngIf="!user.avatar" class="fas fa-user-circle fa-3x"></i>
+        </div>
+        <div class="profile-info">
+          <h3>{{ user.nom }}</h3>
+          <p class="profile-title">{{ user.titre }}</p>
+          <div class="profile-skills">
+            <span *ngFor="let skill of user.competences.slice(0,3)">{{ skill.nom }}</span>
+            <span *ngIf="user.competences.length > 3" class="more">+{{ user.competences.length - 3 }}</span>
+          </div>
+          <a [routerLink]="['/profil', user.id]" class="card-link">Voir profil →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

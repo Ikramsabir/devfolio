@@ -1,0 +1,44 @@
+<app-navbar-visitor></app-navbar-visitor>
+
+<main class="accueil-container">
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title" *ngIf="isConnected">
+        Bonjour <span class="highlight">{{ currentUser?.nom }}</span>
+      </h1>
+      <h1 class="hero-title" *ngIf="!isConnected">
+        Bienvenue sur <span class="highlight">DevFolio</span>
+      </h1>
+      <p class="hero-subtitle" *ngIf="isConnected">
+        Prêt à partager vos nouveautés ou découvrir de nouveaux talents ?
+      </p>
+      <p class="hero-subtitle" *ngIf="!isConnected">
+        Plateforme des développeurs – montrez vos projets, découvrez des talents.
+      </p>
+      <div class="hero-buttons">
+        <a routerLink="/recherche" class="btn btn-primary">Explorer les projets</a>
+        <a *ngIf="!isConnected" routerLink="/register" class="btn btn-secondary">Rejoindre la communauté</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="featured">
+    <div class="section-header">
+      <h2>Projets à la une</h2>
+      <p>Quelques réalisations remarquables</p>
+    </div>
+    <div class="projects-grid">
+      <div *ngFor="let project of featuredProjects" class="project-card">
+        <div class="card-icon"><i class="fas fa-rocket"></i></div>
+        <h3>{{ project.titre }}</h3>
+        <p class="project-desc">{{ project.description }}</p>
+        <div class="project-tech">
+          <span *ngFor="let t of project.technologies">{{ t }}</span>
+        </div>
+        <a [routerLink]="['/projet', project.id]" class="card-link">Voir le projet →</a>
+      </div>
+    </div>
+  </section>
+
+  
+</main>

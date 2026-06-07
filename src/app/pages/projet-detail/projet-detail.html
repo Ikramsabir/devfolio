@@ -1,0 +1,74 @@
+<ng-container *ngIf="isOwner; else visitorNav">
+  <app-navbar-profile [activeTab]="activeTab" [isOwner]="isOwner" [unreadCount]="unreadCount" (tabChange)="navigateToProfileTab($event)"></app-navbar-profile>
+</ng-container>
+<ng-template #visitorNav>
+  <app-navbar-visitor></app-navbar-visitor>
+</ng-template>
+
+<div class="detail-container" *ngIf="project; else notFound">
+  <div class="detail-card">
+    <div class="detail-content">
+      <h1 class="detail-title">{{ project.titre }}</h1>
+      <p class="detail-description">{{ project.description }}</p>
+
+      <div class="detail-full-description" *ngIf="project.fullDescription">
+        <h3>Description complète</h3>
+        <p>{{ project.fullDescription }}</p>
+      </div>
+
+      <div class="detail-tech">
+        <h3>Technologies utilisées</h3>
+        <div class="tech-badges">
+          <span *ngFor="let t of project.technologies">{{ t }}</span>
+        </div>
+      </div>
+
+      <div class="detail-developer">
+        <span>Développeur : </span>
+        <a [routerLink]="['/profil', developer?.id]">
+          {{ developer?.nom || 'Inconnu' }}
+        </a>
+      </div>
+
+      <!-- Liens du projet (uniquement via le tableau liens) -->
+      <div class="detail-links" *ngIf="hasAnyLink()">
+        <h3>Liens du projet</h3>
+        <div class="links-group" *ngIf="project.liens && project.liens.length > 0">
+          <ng-container *ngFor="let lien of project.liens">
+            <a *ngIf="lien.url && lien.url.trim() !== ''"
+               [href]="lien.url" target="_blank" class="btn-link"
+               [class]="getLinkClass(lien.type)" [title]="lien.customName || lien.type">
+              <i [class]="getLinkIcon(lien.type)"></i> {{ lien.customName || getLinkLabel(lien.type) }}
+            </a>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Documents du projet -->
+      <div class="detail-documents" *ngIf="project.documents && project.documents.length > 0">
+        <h3>Documents joints</h3>
+        <div class="documents-list">
+          <div *ngFor="let doc of project.documents" class="document-item">
+            <i class="fas fa-file-alt"></i>
+            <span class="doc-name">{{ getDocumentLabel(doc) }}</span>
+            <span class="doc-desc" *ngIf="doc.description"> - {{ doc.description }}</span>
+            <a class="btn-download" (click)="downloadDocument(doc)" title="Télécharger">
+              <i class="fas fa-download"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-date" *ngIf="project.date">
+        <i class="far fa-calendar-alt"></i> Année : {{ project.date }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #notFound>
+  <div class="not-found">
+    <h2>Projet non trouvé</h2>
+    <a routerLink="/accueil">Retour à l'accueil</a>
+  </div>
+</ng-template>
