@@ -45,12 +45,12 @@ export class ProjectService {
     return [
       // 1 public
       {
-        id: 1, titre: 'TaskFlow', description: 'Application Kanban',
-        fullDescription: 'TaskFlow est une application complète de gestion de tâches inspirée de Trello. Elle permet de créer des tableaux, des listes et des cartes, d\'assigner des membres, de fixer des dates d\'échéance et de suivre la progression en temps réel. Le backend utilise Firebase pour l\'authentification, les notifications par email et la synchronisation en direct.',
-        technologies: ['Angular', 'RxJS', 'Firebase'], userId: 1, status: 'public', imageUrl: 'assets/taskflow.png', date: '2024',
+        id: 1,  titre: 'DevFolio', description: 'Portfolio dev',
+        fullDescription: 'DevFolio est le projet que vous êtes en train de développer : une plateforme où les développeurs peuvent créer leur portfolio, gérer leurs projets et compétences, et contacter d\'autres développeurs. L\'authentification est locale (simulée) et les données sont persistées dans localStorage. Mode sombre, recherche avancée.',
+        technologies: ['Angular', 'LocalStorage', 'RxJS'], userId: 4, status: 'public', imageUrl: 'assets/devfolio.png', date: '2025',
         liens: [
-          { type: 'github', url: 'https://github.com/example/taskflow' },
-          { type: 'demoweb', url: 'https://taskflow.demo.com' }
+          { type: 'github', url: 'https://github.com/Ikramsabir/devfolio' },
+          { type: 'demoweb', url: 'https://ikramsabir.github.io/devfolio/' }
         ]
       },
       // 2 public
@@ -95,12 +95,12 @@ export class ProjectService {
       },
       // 6 public
       {
-        id: 6, titre: 'DevFolio', description: 'Portfolio dev',
-        fullDescription: 'DevFolio est le projet que vous êtes en train de développer : une plateforme où les développeurs peuvent créer leur portfolio, gérer leurs projets et compétences, et contacter d\'autres développeurs. L\'authentification est locale (simulée) et les données sont persistées dans localStorage. Mode sombre, recherche avancée.',
-        technologies: ['Angular', 'LocalStorage', 'RxJS'], userId: 4, status: 'public', imageUrl: 'assets/devfolio.png', date: '2025',
+        id: 6,  titre: 'TaskFlow', description: 'Application Kanban',
+        fullDescription: 'TaskFlow est une application complète de gestion de tâches inspirée de Trello. Elle permet de créer des tableaux, des listes et des cartes, d\'assigner des membres, de fixer des dates d\'échéance et de suivre la progression en temps réel. Le backend utilise Firebase pour l\'authentification, les notifications par email et la synchronisation en direct.',
+        technologies: ['Angular', 'RxJS', 'Firebase'], userId: 4, status: 'public', imageUrl: 'assets/taskflow.png', date: '2024',
         liens: [
-          { type: 'github', url: 'https://github.com/example/devfolio' },
-          { type: 'demoweb', url: 'https://devfolio.demo.com' }
+          { type: 'github', url: 'https://github.com/example/taskflow' },
+          { type: 'demoweb', url: 'https://taskflow.demo.com' }
         ]
       },
       // 7 public
